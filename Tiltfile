@@ -64,8 +64,8 @@ local_resource(
     aarch64|arm64) target_arch="aarch64" ;;
     *) echo "Unsupported arch: $arch" >&2; exit 1 ;;
   esac
-  target="${target_arch}-unknown-linux-musl"
-  export CARGO_TARGET_DIR="../../.tilt/rgkl/target"
+  target="${target_arch}-unknown-linux-gnu"
+  export CARGO_TARGET_DIR="./target"
 
   # ---------------- build ----------------
   echo "🔨 building rgkl → ${target}"
@@ -74,7 +74,7 @@ local_resource(
   # ---------------- copy ----------------
   install -Dm755 \
     "${CARGO_TARGET_DIR}/${target}/debug/rgkl" \
-    "../../.tilt/rgkl/rgkl"
+    "../../.tilt/rgkl"
   """,
   deps=[
     "./crates/rgkl/src",
@@ -93,13 +93,13 @@ docker_build_with_restart(
   only=[
     './proto',
     './.tilt/cluster-agent',
-    './.tilt/rgkl/rgkl',
+    './.tilt/rgkl',
   ],
   live_update=[
     sync('./.tilt/cluster-agent/cluster-agent', '/cluster-agent/cluster-agent'),
     sync(
-      './.tilt/rgkl/rgkl',
-      '/usr/local/bin/rgkl'
+      './.tilt/rgkl',
+      '/usr/local/bin'
     ),
   ]
 )
